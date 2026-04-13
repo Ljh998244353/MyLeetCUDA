@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import time
 from functools import partial
 from typing import Optional
@@ -25,6 +26,18 @@ lib = load(
 )
 
 
+@contextmanager
+def nvtx_range(message: str):
+    if not torch.cuda.is_available():
+        yield
+        return
+    torch.cuda.nvtx.range_push(message)
+    try:
+        yield
+    finally:
+        torch.cuda.nvtx.range_pop()
+
+
 def run_benchmark(
     perf_func: callable,
     a: torch.Tensor,
@@ -36,24 +49,28 @@ def run_benchmark(
     show_all: bool = False,
 ):
     # torch.dot vs custom dot_prod kernel
+    shape_str = "x".join(str(dim) for dim in a.shape)
+    nvtx_prefix = f"elementwise_add/{tag}/shape={shape_str}/dtype={a.dtype}"
     if out is not None:
         out.fill_(0)
     # warmup
-    if out is not None:
-        for i in range(warmup):
-            perf_func(a, b, out)
-    else:
-        for i in range(warmup):
-            _ = perf_func(a, b)
+    with nvtx_range(f"{nvtx_prefix}/warmup"):
+        if out is not None:
+            for i in range(warmup):
+                perf_func(a, b, out)
+        else:
+            for i in range(warmup):
+                _ = perf_func(a, b)
     torch.cuda.synchronize()
     start = time.time()
     # iters
-    if out is not None:
-        for i in range(iters):
-            perf_func(a, b, out)
-    else:
-        for i in range(iters):
-            out = perf_func(a, b)
+    with nvtx_range(f"{nvtx_prefix}/iters={iters}"):
+        if out is not None:
+            for i in range(iters):
+                perf_func(a, b, out)
+        else:
+            for i in range(iters):
+                out = perf_func(a, b)
     torch.cuda.synchronize()
     end = time.time()
     total_time = (end - start) * 1000  # ms

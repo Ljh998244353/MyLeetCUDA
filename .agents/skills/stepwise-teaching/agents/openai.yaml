@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stepwise Teaching"
+  short_description: "Teach tasks in small steps and wait for user feedback"
+  default_prompt: "Use $stepwise-teaching to teach me step by step and pause whenever I need to do something."
