@@ -30,3 +30,11 @@ build*
 .github/copilot-instructions.md
 .codex
 .cache/
+compile_commands.json
+.pytest_cache/
+*.o
+*.obj
+*.out
+hello_word
+Tutorial/test
+Tutorial/gemm_benchmark/gemm_benchmark
