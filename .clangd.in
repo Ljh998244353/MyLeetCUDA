@@ -1,0 +1,30 @@
+CompileFlags:
+  CompilationDatabase: out/clangd
+  Compiler: clang++
+  Add:
+    - -xcuda
+    - --cuda-path=@CUDA_TOOLKIT_ROOT_DIR@
+    - --cuda-gpu-arch=sm_@CMAKE_CUDA_ARCHITECTURES@
+    - -nocudalib
+    - -Wno-unknown-cuda-version
+    - -I@CMAKE_SOURCE_DIR@/clangd-stubs
+    - -DTORCH_API_INCLUDE_EXTENSION_H
+    - -D_GLIBCXX_USE_CXX11_ABI=@TORCH_CXX11_ABI@
+    - -I@Python3_INCLUDE_DIRS@
+    - -std=c++17
+  Remove:
+    - -forward-unknown-to-host-compiler
+    - --generate-code*
+    - --expt-relaxed-constexpr
+    - -diag-suppress*
+    - -x
+    - cu
+
+Diagnostics:
+  Suppress:
+    - pp_file_not_found
+    - member_function_call_bad_type
+    - ovl_no_viable_member_function_in_call
+    - typecheck_invalid_operands
+    - fatal_too_many_errors
+    - undeclared_var_use

@@ -1,5 +1,7 @@
 # CUDA 学习计划（2026-04-13 至 2026-07-05）
 
+run cmake -S . -B out/clangd -DPython3_EXECUTABLE=/home/ljh/miniconda3/envs/AI_env/bin/python3
+
 ## 计划假设
 
 - 起始日期默认从 `2026-04-13` 开始，连续 12 周，共 84 天。
